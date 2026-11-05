@@ -1,0 +1,17 @@
+# Kişisel analiz ve hesap verileri (ASLA YÜKLENMEMELİ)
+SiteAnaliz/
+**/accounts.txt
+**/session.dat
+**/debug.html
+
+# Visual Studio ve Derleme Çıktıları
+.vs/
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*_wpftmp.csproj
+*.pdb
+*.old.exe
