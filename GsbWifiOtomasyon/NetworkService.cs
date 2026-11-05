@@ -62,6 +62,7 @@ namespace GsbWifiOtomasyon
 
             _currentViewState = "";
             _logoutButtonId = "";
+            SonKotaBilgisi = "Kota okunamadı.";
         }
 
         private void OturumCereziniKaydet()
@@ -122,10 +123,7 @@ namespace GsbWifiOtomasyon
                 SayfaVerileriniGuncelle(html);
 
                 bool oturumAktif = html.Contains("Toplam Kalan Kota") ||
-                                   html.Contains("Total Remaining Quota") ||
-                                   html.Contains("Oturumu Sonlandır") ||
-                                   html.Contains("End Session") ||
-                                   html.Contains("servisUpdateForm");
+                                   html.Contains("Total Remaining Quota");
 
                 if (oturumAktif)
                 {
@@ -149,6 +147,11 @@ namespace GsbWifiOtomasyon
 
             try
             {
+                if (_cookies.GetCookies(new Uri("https://wifi.gsb.gov.tr/"))["JSESSIONID"] == null)
+                {
+                    try { await _client.GetAsync("login.html"); } catch { }
+                }
+
                 var formData = new List<KeyValuePair<string, string>>
                 {
                     new KeyValuePair<string, string>("j_username", kAdi),
@@ -167,10 +170,7 @@ namespace GsbWifiOtomasyon
                 SayfaVerileriniGuncelle(html);
 
                 bool girisBasarili = html.Contains("Toplam Kalan Kota") ||
-                                     html.Contains("Total Remaining Quota") ||
-                                     html.Contains("Oturumu Sonlandır") ||
-                                     html.Contains("End Session") ||
-                                     html.Contains("servisUpdateForm");
+                                     html.Contains("Total Remaining Quota");
 
                 if (girisBasarili)
                 {
@@ -261,6 +261,13 @@ namespace GsbWifiOtomasyon
                     await _client.GetAsync("logout");
                     await Task.Delay(500);
                     istemciyiHazirla();
+                    return await LoginOl(kAdi, sifre, denemeSayisi + 1, atilanCihazBilgisi);
+                }
+                else if (html.Contains("Oturumu Sonlandır") || html.Contains("End Session") || html.Contains("servisUpdateForm"))
+                {
+                    // Oturum arafta kalmış (eski oturum tam kapanmamış veya servis durmuş)
+                    await OturumuKapat();
+                    await Task.Delay(1200);
                     return await LoginOl(kAdi, sifre, denemeSayisi + 1, atilanCihazBilgisi);
                 }
                 else if (html.Contains("j_username") || html.Contains("Giriş"))

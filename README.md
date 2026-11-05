@@ -1,22 +1,29 @@
-# 🌐 GSB Wi-Fi Kontrol Pro (Otomasyon & GoodbyeDPI)
+# GSB Wi-Fi Kontrol Pro
 
-KYK / GSB Yurt Wi-Fi (Captive Portal) ağına tarayıcı açmadan, doğrudan HTTP paketleriyle saniyeler içinde giriş/çıkış yapmayı sağlayan, çoklu hesap destekli ve dahili GoodbyeDPI entegrasyonuna sahip masaüstü otomasyon uygulaması.
+KYK yurtlarındaki GSB Wi-Fi (Captive Portal) ağına tarayıcı açmadan, doğrudan HTTP paketleriyle giriş ve çıkış yapmayı sağlayan masaüstü otomasyon uygulaması.
 
-## 🚀 Özellikler
-- **⚡ Paket Tabanlı Hızlı Giriş & Çıkış:** Yoğun saatlerde GSB portal sayfasının yüklenmesini beklemeden doğrudan arka plan paketleriyle anında oturum açar ve kapatır.
-- **🔄 Otomatik Cihaz Düşürme (Auto-Kick):** Hesap başka bir cihazda (ör. telefonda) açıksa, maksimum cihaz uyarısını otomatik aşarak diğer cihazdaki oturumu sonlandırır, hangi MAC adresli cihazın atıldığını ekranda bildirir ve anında giriş yapar.
-- **🛡️ Dahili GoodbyeDPI & Akıllı Bypass:**
-  - **Tek .exe Taşınabilirliği:** GoodbyeDPI dosyaları doğrudan uygulama içerisine gömülüdür (`EmbeddedResource`), ekstra klasör gerektirmez.
-  - **Windows Servis Senkronizasyonu:** Bilgisayardaki mevcut GoodbyeDPI servisiyle tam senkronize çalışır.
-  - **Otomatik Duraklat-İşlem Yap-Tekrar Aç:** GoodbyeDPI açıkken GSB işlemleri (Giriş, Çıkış, Kota Yenileme) yapılacağı zaman GoodbyeDPI'ı geçici olarak duraklatır, işlemi tamamlar ve ardından otomatik olarak eski durumuna döndürür.
-- **📊 Kota ve Son Güncelleme Saati Takibi:** 32 GB ana kotayı, kalan süreyi ve kotanın en son hangi saatte güncellendiğini gösterir.
-- **👥 Çoklu Hesap Yönetimi:** Sınırsız sayıda hesabı isimlendirerek (`Belgelerim\GsbAccounts\accounts.txt`) kaydetme, düzenleme ve oturum açıkken bile tek tıkla hesaplar arası geçiş yapma imkanı sunar.
+Yurt internetinin yoğun olduğu saatlerde giriş sayfasının (`wifi.gsb.gov.tr`) yüklenmeme sorununu aşmak, başka cihazda açık kalan oturumları tek tıkla düşürüp bağlanmak ve GSB portalı ile çakışan GoodbyeDPI servisini giriş/çıkış işlemleri sırasında otomatik yönetmek amacıyla geliştirilmiştir.
 
-## 📦 Kurulum ve Kullanım (Release)
-1. Sağ taraftaki **Releases** bölümünden en güncel `GsbWifiOtomasyon.exe` dosyasını indirin.
-2. Uygulama hiçbir ek klasöre ihtiyaç duymadan tek bir `.exe` olarak çalışır.
+## İndirme ve Kullanım
 
-## 🛠 Teknik Altyapı
-- **Dil & Arayüz:** C# / WPF (.NET Framework 4.8)
-- **Ağ & Doğrulama:** `HttpClient` (JSF ViewState & Spring Security Paket Otomasyonu)
-- **DPI Yönetimi:** Gömülü GoodbyeDPI & WinDivert Windows Servis Yöneticisi
+Uygulamayı kaynak kodunu derlemeden doğrudan kullanmak için:
+
+1. Sağ taraftaki [Releases](https://github.com/dmnkadir/Gsb-Wifi-Automator/releases) bölümünden en güncel `GsbWifiOtomasyon.exe` dosyasını indirin.
+2. Uygulama tek bir `.exe` dosyası olarak çalışır; yanında ek bir klasör veya kurulum gerektirmez.
+
+## Temel Özellikler
+
+- **Paket Tabanlı Doğrudan Giriş ve Çıkış:** Tarayıcı arayüzünü yüklemeden doğrudan arka planda kimlik doğrulama ve oturum sonlandırma paketlerini gönderir.
+- **Açık Oturumu Otomatik Sonlandırma:** Giriş yapılan hesap başka bir cihazda (örneğin telefonda) açıksa, maksimum cihaz sınırı ekranını otomatik geçerek diğer cihazdaki oturumu kapatır, hangi cihazın (MAC adresi ve giriş saati) düşürüldüğünü bilgi satırında gösterir ve bağlantıyı kurar.
+- **Dahili GoodbyeDPI Yönetimi ve Otomatik Bypass:**
+  - GoodbyeDPI dosyaları doğrudan `.exe` içerisine gömülüdür; bilgisayarda GoodbyeDPI kurulu olmasa bile uygulama içindeki anahtar (Switch) üzerinden açılıp kapatılabilir.
+  - Bilgisayarda halihazırda çalışan bir GoodbyeDPI Windows servisi varsa durumu otomatik algılar ve senkronize olur.
+  - GoodbyeDPI açıkken GSB portalına erişilemediği için; giriş yapma, çıkış yapma ve kota yenileme işlemleri sırasında GoodbyeDPI'ı geçici olarak duraklatır, işlemi tamamlar ve işlem sonunda tekrar eski durumuna döndürür.
+- **Kota ve Güncelleme Saati Takibi:** Kalan ana internet kotasını (GB), geçerlilik süresini ve kotanın en son güncellendiği saati gösterir.
+- **Çoklu Hesap Kaydı ve Hızlı Geçiş:** Kaydedilen hesapları `Belgelerim\GsbAccounts\accounts.txt` altında saklar. Bir hesapta oturum açıkken listedeki başka bir hesaba tıklandığında mevcut oturumu güvenli şekilde kapatıp yeni hesaba geçiş yapar.
+
+## Teknik Bilgiler
+
+- **Platform:** Windows (.NET Framework 4.8, WPF)
+- **Ağ Katmanı:** `HttpClient` (Spring Security & JSF ViewState AJAX oturum yönetimi)
+- **Servis Yönetimi:** Windows Service Control (`sc.exe`) üzerinden GoodbyeDPI ve WinDivert yönetimi (Yönetici izni gerektirir)

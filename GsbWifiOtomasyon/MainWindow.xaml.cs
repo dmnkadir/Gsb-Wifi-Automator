@@ -145,19 +145,31 @@ namespace GsbWifiOtomasyon
                 return;
             }
 
-            btnLogin.IsEnabled = false;
-            txtStatus.Text = "Giriş yapılıyor...";
-
             bool oturumZatenAcikti = panelControls.Visibility == Visibility.Visible;
+
+            // Eğer açık bir oturum varsa önce arayüzde çıkış yapıldığını göster ve eski kotayı ekrandan temizle
+            if (oturumZatenAcikti)
+            {
+                panelControls.Visibility = Visibility.Collapsed;
+                panelSaveNickname.Visibility = Visibility.Collapsed;
+                panelLogin.Visibility = Visibility.Visible;
+                txtQuota.Text = "Yükleniyor...";
+            }
+
+            btnLogin.IsEnabled = false;
+            txtStatus.Text = oturumZatenAcikti ? "Mevcut oturum kapatılıyor..." : "Giriş yapılıyor...";
+
             var sonuc = await ExecuteWithDpiBypassAsync(async () =>
             {
                 if (oturumZatenAcikti)
                 {
                     await _networkService.OturumuKapat();
-                    await Task.Delay(300);
+                    txtStatus.Text = "Yeni hesaba giriş yapılıyor...";
+                    await Task.Delay(1500);
                 }
                 return await _networkService.LoginOl(kadi, sifre);
-            }, oturumZatenAcikti ? "Mevcut oturum kapatılıp yeni hesaba geçiliyor..." : "GoodbyeDPI duraklatılıyor ve giriş yapılıyor...");
+            }, oturumZatenAcikti ? "GoodbyeDPI duraklatıldı, hesap değiştiriliyor..." : "GoodbyeDPI duraklatılıyor ve giriş yapılıyor...");
+
             btnLogin.IsEnabled = true;
 
             if (sonuc.basarili)
@@ -166,10 +178,7 @@ namespace GsbWifiOtomasyon
                 panelControls.Visibility = Visibility.Visible;
                 panelLogin.Visibility = Visibility.Collapsed;
 
-                // Görünürlük (Opacity) animasyonu: 0'dan 1'e 0.6 saniyede çıksın
                 var fadeIn = new System.Windows.Media.Animation.DoubleAnimation(0, 1, TimeSpan.FromSeconds(0.6));
-
-                // Aşağıdan yukarı kayma animasyonu: 30 birim aşağıdan 0'a (kendi yerine) gelsin
                 var slideUp = new System.Windows.Media.Animation.DoubleAnimation(30, 0, TimeSpan.FromSeconds(0.6));
 
                 panelControls.BeginAnimation(OpacityProperty, fadeIn);
